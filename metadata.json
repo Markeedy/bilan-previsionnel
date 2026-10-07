@@ -1,0 +1,6 @@
+{
+  "name": "BTP Khemisti - Suivi Budgétaire & Prévisionnel",
+  "description": "Application de pilotage financier, métrés et suivi budgétaire prévisionnel de chantier BTP - Travaux de réhabilitation du port de pêche de Khemisti (EGUVA / GITRA).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
