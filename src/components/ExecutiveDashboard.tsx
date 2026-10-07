@@ -1,6 +1,7 @@
 import React from 'react';
 import { useBudgetStore } from '../store/useBudgetStore';
 import { formatDA, formatPercent } from '../utils/formatters';
+import { BudgetRiskSection } from './BudgetRiskSection';
 import {
   TrendingUp,
   Wallet,
@@ -412,6 +413,9 @@ export const ExecutiveDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* SECTION VISUALISATION DES RISQUES BUDGÉTAIRES & LOTS CRITIQUES */}
+      <BudgetRiskSection />
 
       {/* LOT SUMMARY TABLE CARDS */}
       <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">

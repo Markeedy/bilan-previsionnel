@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useBudgetStore } from '../store/useBudgetStore';
 import { exportBudgetToExcel } from '../services/excelService';
+import { exportBudgetToCsv } from '../services/csvExportService';
 import {
   FileSpreadsheet,
   RotateCcw,
@@ -13,18 +14,24 @@ import {
   Loader2,
   HardDriveDownload,
   Award,
+  Activity,
+  TrendingUp,
+  Download,
+  Sliders,
 } from 'lucide-react';
 
 interface ProjectHeaderProps {
   onOpenAudit: () => void;
   onOpenSql: () => void;
-  activeTab: 'DASHBOARD' | 'GRID' | 'LOTS';
-  setActiveTab: (tab: 'DASHBOARD' | 'GRID' | 'LOTS') => void;
+  onOpenGoogleSheets: () => void;
+  activeTab: 'DASHBOARD' | 'GRID' | 'LOTS' | 'EVM' | 'SCURVE' | 'WHATIF';
+  setActiveTab: (tab: 'DASHBOARD' | 'GRID' | 'LOTS' | 'EVM' | 'SCURVE' | 'WHATIF') => void;
 }
 
 export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   onOpenAudit,
   onOpenSql,
+  onOpenGoogleSheets,
   activeTab,
   setActiveTab,
 }) => {
@@ -40,6 +47,14 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
       console.error('Erreur export Excel', err);
     } finally {
       setIsExporting(false);
+    }
+  };
+
+  const handleExportCsv = () => {
+    try {
+      exportBudgetToCsv(metadata, workPackages, items);
+    } catch (err) {
+      console.error('Erreur export CSV', err);
     }
   };
 
@@ -123,6 +138,16 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
 
         {/* ACTION BUTTONS */}
         <div className="flex flex-wrap items-center gap-2">
+          {/* Google Sheets Integration */}
+          <button
+            onClick={onOpenGoogleSheets}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-teal-600 hover:bg-teal-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-all"
+            title="Ouvrir l'intégration Google Sheets et Google Drive"
+          >
+            <FileSpreadsheet className="w-4 h-4 text-emerald-200" />
+            <span>Google Sheets</span>
+          </button>
+
           {/* Excel Export */}
           <button
             onClick={handleExport}
@@ -136,6 +161,16 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
               <FileSpreadsheet className="w-4 h-4" />
             )}
             <span>Export Excel (.xlsx)</span>
+          </button>
+
+          {/* CSV Export */}
+          <button
+            onClick={handleExportCsv}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-lg text-xs font-semibold shadow-sm transition-all"
+            title="Exporter les données du bordereau au format CSV (point-virgule, UTF-8 BOM, compatible Excel et reporting ERP)"
+          >
+            <Download className="w-4 h-4 text-blue-200" />
+            <span>Export CSV (.csv)</span>
           </button>
 
           {/* Audit Log Modal Trigger */}
@@ -207,6 +242,42 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
           >
             <ShieldCheck className="w-4 h-4 text-amber-400" />
             <span>Synthèse des 6 Lots Contractuels</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('EVM')}
+            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === 'EVM'
+                ? 'border-emerald-500 text-white bg-slate-900'
+                : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
+            }`}
+          >
+            <Activity className="w-4 h-4 text-emerald-400" />
+            <span>Avancement Physique & Valeur Acquise (EVM)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('SCURVE')}
+            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === 'SCURVE'
+                ? 'border-indigo-500 text-white bg-slate-900'
+                : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
+            }`}
+          >
+            <TrendingUp className="w-4 h-4 text-indigo-400" />
+            <span>Courbe en S (Prévisionnel vs Réel)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('WHATIF')}
+            className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === 'WHATIF'
+                ? 'border-purple-500 text-white bg-slate-900'
+                : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
+            }`}
+          >
+            <Sliders className="w-4 h-4 text-purple-400" />
+            <span>Simulateur What-If & Trésorerie</span>
           </button>
         </div>
       </div>

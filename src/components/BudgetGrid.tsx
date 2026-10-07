@@ -11,6 +11,7 @@ import { useBudgetStore } from '../store/useBudgetStore';
 import { BudgetItem, WorkPackage } from '../types/budget';
 import { EditableCell } from './EditableCell';
 import { formatDA, formatQuantity } from '../utils/formatters';
+import { exportBudgetToCsv } from '../services/csvExportService';
 import { 
   ChevronDown, 
   ChevronRight, 
@@ -21,11 +22,13 @@ import {
   Maximize2, 
   Minimize2,
   FileText,
-  HelpCircle
+  HelpCircle,
+  Download,
 } from 'lucide-react';
 
 export const BudgetGrid: React.FC = () => {
   const {
+    metadata,
     workPackages,
     items,
     expandedLots,
@@ -502,6 +505,16 @@ export const BudgetGrid: React.FC = () => {
           >
             <Minimize2 className="w-3.5 h-3.5" />
             <span>Replier</span>
+          </button>
+
+          {/* Quick CSV Export */}
+          <button
+            onClick={() => exportBudgetToCsv(metadata, workPackages, items)}
+            className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg shadow-xs transition-colors"
+            title="Exporter le bordereau actuel au format CSV"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>CSV</span>
           </button>
         </div>
       </div>

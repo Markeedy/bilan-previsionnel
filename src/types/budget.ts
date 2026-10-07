@@ -72,3 +72,18 @@ export interface ProjectMetadata {
   date: string;
   isoCertifications: string[];
 }
+
+export interface EVMMetrics {
+  totalBAC: number; // Budget at Completion (Total Contract Budget)
+  totalEV: number;  // Earned Value (Valeur Acquise)
+  totalAC: number;  // Actual Cost (Budget Réalisé Consommé)
+  totalPV: number;  // Planned Value (Valeur Planifiée à date)
+  physicalProgressPct: number; // % Avancement physique global pondéré
+  costVariance: number; // CV = EV - AC
+  scheduleVariance: number; // SV = EV - PV
+  cpi: number; // Cost Performance Index (EV / AC)
+  spi: number; // Schedule Performance Index (EV / PV)
+  eac: number; // Estimate at Completion (BAC / CPI)
+  etc: number; // Estimate to Complete (EAC - AC)
+  vac: number; // Variance at Completion (BAC - EAC)
+}

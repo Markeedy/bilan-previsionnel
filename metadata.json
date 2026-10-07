@@ -1,6 +1,6 @@
 {
-  "name": "BTP Khemisti - Suivi Budgétaire & Prévisionnel",
-  "description": "Application de pilotage financier, métrés et suivi budgétaire prévisionnel de chantier BTP - Travaux de réhabilitation du port de pêche de Khemisti (EGUVA / GITRA).",
-  "requestFramePermissions": [],
+  "name": "NaviSeas Pro - Navigation Maritime & Prévisions Halieutiques",
+  "description": "Système de navigation maritime ECDIS S-52/S-57, télémétrie Signal K, décodage AIS AIVDM, filtrage de Kalman EKF, météo marine Open-Meteo et prédictions solunaires.",
+  "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -5,7 +5,8 @@ import {
   ProjectMetadata, 
   LotSummary, 
   ProjectConsolidation, 
-  AuditLogEntry 
+  AuditLogEntry,
+  EVMMetrics
 } from '../types/budget';
 import { 
   INITIAL_WORK_PACKAGES, 
@@ -49,10 +50,21 @@ interface BudgetState {
   setSelectedItemForModal: (item: BudgetItem | null) => void;
   resetToDefault: () => void;
   clearAuditLogs: () => void;
+  updateItemProgressPercentage: (
+    itemId: string,
+    percentage: number,
+    userName?: string
+  ) => { success: boolean; message?: string };
+  updateLotProgressPercentage: (
+    lotId: string,
+    percentage: number,
+    userName?: string
+  ) => void;
 
   // Computed Getters
   getConsolidation: () => ProjectConsolidation;
   getLotSummaries: () => LotSummary[];
+  getEVMMetrics: () => EVMMetrics;
   getItemById: (id: string) => BudgetItem | undefined;
 }
 
@@ -339,6 +351,70 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       totalForecastThreeMonths,
       varianceToRemaining,
       isBalanced,
+    };
+  },
+
+  updateItemProgressPercentage: (itemId, percentage, userName = 'Chef de Chantier (EGUVA)') => {
+    const currentItems = get().items;
+    const targetItem = currentItems.find((it) => it.id === itemId);
+    if (!targetItem) return { success: false, message: 'Article introuvable' };
+
+    const cleanPct = Math.max(0, Math.min(100, percentage));
+    const newPreviousQty = Number(((cleanPct / 100) * targetItem.contractQuantity).toFixed(3));
+    
+    return get().updateItemField(
+      itemId,
+      'previousQuantity',
+      newPreviousQty,
+      `${userName} [Avancement ${cleanPct.toFixed(1)}%]`
+    );
+  },
+
+  updateLotProgressPercentage: (lotId, percentage, userName = 'Chef de Chantier (EGUVA)') => {
+    const cleanPct = Math.max(0, Math.min(100, percentage));
+    const currentItems = get().items;
+    const lotItems = currentItems.filter((it) => it.workPackageId === lotId);
+    
+    lotItems.forEach((it) => {
+      const newPreviousQty = Number(((cleanPct / 100) * it.contractQuantity).toFixed(3));
+      get().updateItemField(
+        it.id,
+        'previousQuantity',
+        newPreviousQty,
+        `${userName} [Lot ${cleanPct.toFixed(1)}%]`
+      );
+    });
+  },
+
+  getEVMMetrics: () => {
+    const consolidation = get().getConsolidation();
+    const totalBAC = consolidation.totalContractAmount; // Budget global contractuel
+    const totalEV = consolidation.totalPreviousAmount;  // Valeur acquise = cumul travaux réalisés au prix bordereau
+    const totalAC = consolidation.totalPreviousAmount;  // Coût réel consommé à date
+    const totalPV = 1064520; // Valeur planifiée contractuelle à l'arrêté de situation du 06/10/2026
+    
+    const physicalProgressPct = totalBAC > 0 ? (totalEV / totalBAC) * 100 : 0;
+    const costVariance = totalEV - totalAC; // CV = 0 en comptabilité bordereau à prix unitaire fixe
+    const scheduleVariance = totalEV - totalPV; // SV
+    const cpi = totalAC > 0 ? totalEV / totalAC : 1.0;
+    const spi = totalPV > 0 ? totalEV / totalPV : 1.0;
+    const eac = cpi > 0 ? totalBAC / cpi : totalBAC;
+    const etc = Math.max(0, eac - totalAC);
+    const vac = totalBAC - eac;
+
+    return {
+      totalBAC,
+      totalEV,
+      totalAC,
+      totalPV,
+      physicalProgressPct,
+      costVariance,
+      scheduleVariance,
+      cpi,
+      spi,
+      eac,
+      etc,
+      vac,
     };
   },
 }));
